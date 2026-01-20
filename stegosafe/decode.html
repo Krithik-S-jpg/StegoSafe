@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="description" content="Extract hidden messages from images">
+  <title>Decode - StegoSafe</title>
+  <link rel="manifest" href="/stegosafe/pwa/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="StegoSafe">
+  <link rel="apple-touch-icon" href="/stegosafe/assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="/stegosafe/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="/stegosafe/css/style.css">
+</head>
+<body>
+  <!-- Side Menu Bar -->
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <h3>🔐 StegoSafe</h3>
+      <button class="menu-close" id="menuClose">✕</button>
+    </div>
+    <nav class="menu-nav">
+      <button class="menu-item" onclick="window.location.href='/stegosafe/'">
+        <span class="menu-icon">🏠</span>
+        <span class="menu-text">Home</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/encode.html'">
+        <span class="menu-icon">📝</span>
+        <span class="menu-text">Encode</span>
+      </button>
+      <button class="menu-item active" onclick="window.location.href='/stegosafe/decode.html'">
+        <span class="menu-icon">🔍</span>
+        <span class="menu-text">Decode</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#about-section'">
+        <span class="menu-icon">ℹ️</span>
+        <span class="menu-text">About</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#features-section'">
+        <span class="menu-icon">✨</span>
+        <span class="menu-text">Features</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#settings-section'">
+        <span class="menu-icon">⚙️</span>
+        <span class="menu-text">Settings</span>
+      </button>
+    </nav>
+    <div class="menu-footer">
+      <p style="font-size: 0.8rem; color: var(--text-tertiary);">v2.0 Premium</p>
+    </div>
+  </div>
+
+  <!-- Menu Trigger Zone (Left Edge) -->
+  <div class="menu-trigger" id="menuTrigger"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/stegosafe/" class="logo">🔐 StegoSafe</a>
+      <div class="nav-links">
+        <a href="/stegosafe/" class="nav-link">Home</a>
+        <a href="/stegosafe/encode.html" class="nav-link">Encode</a>
+        <a href="/stegosafe/decode.html" class="nav-link active">Decode</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div class="page-header">
+      <h1>🔓 Reveal Your Secret</h1>
+      <p class="subtitle">Extract hidden messages from encoded images</p>
+    </div>
+
+    <div class="encode-grid">
+      <!-- Left Column: Image Upload -->
+      <div class="encode-section">
+        <h2>Step 1: Select Image</h2>
+        
+        <!-- Drag & Drop Zone -->
+        <div id="dragZone" class="drag-zone">
+          <div class="drag-zone-content">
+            <div class="drag-zone-icon">📸</div>
+            <div class="drag-zone-text">Drag encoded image here or click to browse</div>
+            <div class="drag-zone-hint">PNG, JPG, GIF - must contain hidden message</div>
+          </div>
+        </div>
+
+        <input 
+          type="file" 
+          id="imageInput" 
+          accept="image/*" 
+          hidden
+        >
+
+        <!-- Image Preview & Info -->
+        <div id="previewContainer" class="preview-container hidden">
+          <div class="preview-image-wrapper">
+            <img id="previewImage" src="" alt="Preview">
+          </div>
+
+          <div id="imageInfo" class="image-info">
+            <div class="info-item">
+              <span class="info-label">Dimensions:</span>
+              <span class="info-value" id="imageSize">0×0</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Format:</span>
+              <span class="info-value" id="imageFormat">PNG</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Decryption & Message -->
+      <div class="encode-section">
+        <h2>Step 2: Decrypt</h2>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="passwordInput" class="label">Encryption Password <span class="optional">(if used)</span></label>
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="input-text" 
+            placeholder="Enter password if image was encrypted"
+          >
+          <div class="label-hint">
+            🔐 Leave blank if no password was used during encoding
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="progress-container hidden">
+          <div class="progress-label">Decoding in progress...</div>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div class="progress-info">
+            <span id="progressPercent" class="progress-percent">0%</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+          <button id="decodeBtn" class="btn btn-primary">
+            🔓 Decode Message
+          </button>
+          <button id="copyBtn" class="btn btn-success hidden">
+            📋 Copy Message
+          </button>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="alert hidden"></div>
+
+        <!-- Decoded Message Box -->
+        <div id="messageBox" class="message-box hidden">
+          <div class="message-label">🎉 Your Secret Message:</div>
+          <div id="messageOutput" class="message-content"></div>
+          <div class="message-actions">
+            <button id="copyBtn" class="btn btn-copy" title="Copy message">
+              📋 Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="tips-section">
+      <div class="tips-title">💡 Pro Tips</div>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <div class="tip-icon">🔎</div>
+          <div class="tip-content">
+            <strong>Visual Inspection</strong><br>
+            Hidden messages don't change the image visually - they're in the LSBs.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔑</div>
+          <div class="tip-content">
+            <strong>Remember Password</strong><br>
+            Without the correct password, encrypted messages cannot be recovered.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">⚡</div>
+          <div class="tip-content">
+            <strong>No External Upload</strong><br>
+            All decoding happens in your browser - 100% private and secure.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔄</div>
+          <div class="tip-content">
+            <strong>Try Multiple Passwords</strong><br>
+            If decoding fails, double-check the password was entered correctly.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works">
+      <h3>How It Works</h3>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Upload Image:</strong> Select an encoded image from StegoSafe
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Extract LSBs:</strong> Read the least significant bits from RGB channels
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Find Delimiter:</strong> Locate the end marker of the hidden message
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <strong>Decrypt (Optional):</strong> If encrypted, decrypt using your password
+        </div>
+        <div class="step">
+          <span class="step-number">5</span>
+          <strong>Display Message:</strong> View and copy your secret message
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2024 StegoSafe • Open Source Steganography Tool</p>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">GitHub</a>
+      <a href="#">Docs</a>
+    </div>
+  </footer>
+
+  <script src="/stegosafe/js/crypto.js"></script>
+  <script src="/stegosafe/js/decode.js"></script>
+  <script src="/stegosafe/js/features.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/stegosafe/pwa/service-worker.js')
+        .catch(error => console.log('Service Worker registration failed:', error));
+    }
+
+    // Side Menu Functionality
+    const sideMenu = document.getElementById('sideMenu');
+    const menuTrigger = document.getElementById('menuTrigger');
+    const menuClose = document.getElementById('menuClose');
+
+    if (menuTrigger && sideMenu) {
+      menuTrigger.addEventListener('mouseenter', () => {
+        sideMenu.classList.add('open');
+      });
+
+      sideMenu.addEventListener('mouseleave', () => {
+        sideMenu.classList.remove('open');
+      });
+
+      menuClose.addEventListener('click', () => {
+        sideMenu.classList.remove('open');
+      });
+    }
+
+    // Initialize Features
+    document.addEventListener('DOMContentLoaded', () => {
+      // Register keyboard shortcuts
+      FeaturesModule.registerShortcuts({
+        encode: () => window.location.href = '/stegosafe/encode.html',
+        decode: () => document.getElementById('decodeBtn')?.click()
+      });
+    });
+  </script>
+</body>
+</html>

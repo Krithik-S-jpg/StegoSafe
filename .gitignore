@@ -1,0 +1,70 @@
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Node (if future)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.env
+
+# Build outputs
+dist/
+build/
+*.jar
+*.war
+*.zip
+
+# Logs
+*.log
+logs/
+
+# OS temp files
+.temp/
+tmp/
+temp/
+
+# IDE cache
+.eslintcache
+.pytest_cache/
+.coverage
+
+# Local development
+local_config.json
+config.local.js
+
+# Ignore everything in stegosafe/assets/icons but not .gitkeep
+# (keeping icons directory structure)
+
+# Security - never commit sensitive data
+*.pem
+*.key
+*.cert
+secrets.json
+.env.local
+.env.*.local
+
+# Archives
+*.rar
+*.7z
+*.zip
+*.gz
+*.tar

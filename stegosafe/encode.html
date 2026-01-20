@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="description" content="Hide secret messages in images with encryption">
+  <title>Encode - StegoSafe</title>
+  <link rel="manifest" href="/stegosafe/pwa/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="StegoSafe">
+  <link rel="apple-touch-icon" href="/stegosafe/assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="/stegosafe/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="/stegosafe/css/style.css">
+</head>
+<body>
+  <!-- Side Menu Bar -->
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <h3>🔐 StegoSafe</h3>
+      <button class="menu-close" id="menuClose">✕</button>
+    </div>
+    <nav class="menu-nav">
+      <button class="menu-item" onclick="window.location.href='/stegosafe/'">
+        <span class="menu-icon">🏠</span>
+        <span class="menu-text">Home</span>
+      </button>
+      <button class="menu-item active" onclick="window.location.href='/stegosafe/encode.html'">
+        <span class="menu-icon">📝</span>
+        <span class="menu-text">Encode</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/decode.html'">
+        <span class="menu-icon">🔍</span>
+        <span class="menu-text">Decode</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#about-section'">
+        <span class="menu-icon">ℹ️</span>
+        <span class="menu-text">About</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#features-section'">
+        <span class="menu-icon">✨</span>
+        <span class="menu-text">Features</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='/stegosafe/#settings-section'">
+        <span class="menu-icon">⚙️</span>
+        <span class="menu-text">Settings</span>
+      </button>
+    </nav>
+    <div class="menu-footer">
+      <p style="font-size: 0.8rem; color: var(--text-tertiary);">v2.0 Premium</p>
+    </div>
+  </div>
+
+  <!-- Menu Trigger Zone (Left Edge) -->
+  <div class="menu-trigger" id="menuTrigger"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/stegosafe/" class="logo">🔐 StegoSafe</a>
+      <div class="nav-links">
+        <a href="/stegosafe/" class="nav-link">Home</a>
+        <a href="/stegosafe/encode.html" class="nav-link active">Encode</a>
+        <a href="/stegosafe/decode.html" class="nav-link">Decode</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div class="page-header">
+      <h1>🔒 Hide Your Message</h1>
+      <p class="subtitle">Encode a secret message inside an image with optional encryption</p>
+    </div>
+
+    <div class="encode-grid">
+      <!-- Left Column: Image Upload -->
+      <div class="encode-section">
+        <h2>Step 1: Select Image</h2>
+        
+        <!-- Drag & Drop Zone -->
+        <div id="dragZone" class="drag-zone">
+          <div class="drag-zone-content">
+            <div class="drag-zone-icon">📸</div>
+            <div class="drag-zone-text">Drag image here or click to browse</div>
+            <div class="drag-zone-hint">PNG, JPG, GIF - up to 50MB</div>
+          </div>
+        </div>
+
+        <input 
+          type="file" 
+          id="imageInput" 
+          accept="image/*" 
+          hidden
+        >
+
+        <!-- Image Preview & Info -->
+        <div id="previewContainer" class="preview-container hidden">
+          <div class="preview-image-wrapper">
+            <img id="previewImage" src="" alt="Preview">
+          </div>
+
+          <div id="imageInfo" class="image-info">
+            <div class="info-item">
+              <span class="info-label">Dimensions:</span>
+              <span class="info-value" id="imageSize">0×0</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Format:</span>
+              <span class="info-value" id="imageFormat">PNG</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Capacity:</span>
+              <span class="info-value" id="imageCapacity">0 B</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Message & Settings -->
+      <div class="encode-section">
+        <h2>Step 2: Your Secret</h2>
+
+        <!-- Mode Tabs: Text vs File -->
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="text">📝 Text Message</button>
+          <button class="mode-tab" data-mode="file">📦 File Data</button>
+        </div>
+
+        <!-- Text Mode -->
+        <div id="textMode" class="mode-content">
+          <!-- Message Input -->
+          <div class="form-group">
+            <label for="messageInput" class="label">Your Secret Message</label>
+            <textarea 
+              id="messageInput" 
+              class="input-text" 
+              placeholder="Type your secret message here..."
+              rows="6"
+            ></textarea>
+            <div class="char-counter">
+              <span><strong id="charCount">0</strong> / <strong id="charMax">∞</strong> characters</span>
+              <span class="char-hint">💡 Longer messages need larger images</span>
+            </div>
+            
+            <!-- Compression Option -->
+            <div style="margin-top: 12px;">
+              <label class="toggle">
+                <input type="checkbox" id="compressionToggle" class="toggle-input" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-left: 8px; font-size: 0.9rem;">Enable compression (saves space)</span>
+            </div>
+            <div class="compression-info" id="compressionInfo">
+              💾 Compression enabled: ~40% size reduction
+            </div>
+          </div>
+        </div>
+
+        <!-- File Mode -->
+        <div id="fileMode" class="mode-content hidden">
+          <!-- File Upload -->
+          <div class="form-group">
+            <label for="fileInput" class="label">Select File to Hide</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="fileInput" style="display: none;">
+              <div class="drag-zone" id="fileDropZone" style="margin-bottom: 12px;">
+                <div class="drag-zone-content">
+                  <div class="drag-zone-icon">📁</div>
+                  <div class="drag-zone-text">Drop file here or click to browse</div>
+                  <div class="drag-zone-hint" id="fileSizeHint">Any file type • Max 50MB</div>
+                </div>
+              </div>
+            </div>
+            <div id="fileInfo" class="image-info hidden">
+              <div class="info-item">
+                <span class="info-label">File Name:</span>
+                <span class="info-value" id="fileName">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">File Size:</span>
+                <span class="info-value" id="fileSize">0 B</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">File Type:</span>
+                <span class="info-value" id="fileType">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="passwordInput" class="label">Encryption Password <span class="optional">(optional)</span></label>
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="input-text" 
+            placeholder="Leave empty for no encryption"
+          >
+          <div class="label-hint">
+            🔐 Uses AES-256-GCM encryption with PBKDF2 key derivation
+          </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="advanced-options">
+          <div class="advanced-title">⚙️ Advanced Options</div>
+          
+          <!-- LSB Mode Selection -->
+          <div class="option-row">
+            <div class="option-info">
+              <div class="option-label">LSB Depth</div>
+              <div class="option-desc">Higher = more capacity, but riskier</div>
+            </div>
+          </div>
+          <div class="lsb-modes">
+            <button class="lsb-option active" data-lsb="1">1-bit<br>(Safe)</button>
+            <button class="lsb-option" data-lsb="2">2-bit<br>(+4x)</button>
+            <button class="lsb-option" data-lsb="3">3-bit<br>(+8x)</button>
+            <button class="lsb-option" data-lsb="4">4-bit<br>(Max)</button>
+          </div>
+
+          <!-- Stochastic Encoding -->
+          <div class="option-row" style="margin-top: 16px;">
+            <div class="option-info">
+              <div class="option-label">Randomized Placement</div>
+              <div class="option-desc">Scatter data randomly (harder to detect)</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" class="toggle-input">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Efficiency Meter -->
+        <div class="efficiency-meter">
+          <div class="efficiency-bar">
+            <div id="efficiencyFill" class="efficiency-fill"></div>
+          </div>
+          <div class="efficiency-label" id="efficiencyLabel">0%</div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="stats-panel hidden" id="statsPanel">
+          <div class="stat-item">
+            <div class="stat-value" id="statCapacity">0B</div>
+            <div class="stat-label">Capacity</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statUsed">0B</div>
+            <div class="stat-label">Used</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statRemaining">0B</div>
+            <div class="stat-label">Remaining</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statEncoding">0%</div>
+            <div class="stat-label">Efficiency</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="progress-container hidden">
+          <div class="progress-label">Encoding in progress...</div>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div class="progress-info">
+            <span id="progressPercent" class="progress-percent">0%</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+          <button id="encodeBtn" class="btn btn-primary premium">
+            🔐 Encode Message
+          </button>
+          <button id="downloadBtn" class="btn btn-success hidden">
+            ⬇️ Download Image
+          </button>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="alert hidden"></div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="shortcuts-hint">
+          <strong>💡 Keyboard Shortcuts:</strong>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Ctrl+Enter</span> Encode
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Ctrl+D</span> Download
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="tips-section">
+      <div class="tips-title">💡 Pro Tips</div>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <div class="tip-icon">🖼️</div>
+          <div class="tip-content">
+            <strong>Image Size Matters</strong><br>
+            Larger images can hide more data. A 2MP image can hide ~750KB.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔑</div>
+          <div class="tip-content">
+            <strong>Password Protection</strong><br>
+            Always use a strong password for sensitive data.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">👁️</div>
+          <div class="tip-content">
+            <strong>Invisible to Eye</strong><br>
+            LSB changes are imperceptible - the image looks identical.
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">⚡</div>
+          <div class="tip-content">
+            <strong>Fast & Private</strong><br>
+            All processing happens in your browser - nothing is uploaded.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works">
+      <h3>How It Works</h3>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Select Image:</strong> Choose any image as your carrier
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Enter Message:</strong> Type your secret message
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Encrypt (Optional):</strong> Add password for extra security
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <strong>Encode:</strong> Hide the message in the image's pixels
+        </div>
+        <div class="step">
+          <span class="step-number">5</span>
+          <strong>Download:</strong> Save the encoded image and share it
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2024 StegoSafe • Open Source Steganography Tool</p>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">GitHub</a>
+      <a href="#">Docs</a>
+    </div>
+  </footer>
+
+  <script src="/stegosafe/js/crypto.js"></script>
+  <script src="/stegosafe/js/encode.js"></script>
+  <script src="/stegosafe/js/features.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/stegosafe/pwa/service-worker.js')
+        .catch(error => console.log('Service Worker registration failed:', error));
+    }
+
+    // Side Menu Functionality
+    const sideMenu = document.getElementById('sideMenu');
+    const menuTrigger = document.getElementById('menuTrigger');
+    const menuClose = document.getElementById('menuClose');
+
+    if (menuTrigger && sideMenu) {
+      menuTrigger.addEventListener('mouseenter', () => {
+        sideMenu.classList.add('open');
+      });
+
+      sideMenu.addEventListener('mouseleave', () => {
+        sideMenu.classList.remove('open');
+      });
+
+      menuClose.addEventListener('click', () => {
+        sideMenu.classList.remove('open');
+      });
+    }
+
+    // Initialize Features
+    document.addEventListener('DOMContentLoaded', () => {
+      // Register keyboard shortcuts
+      FeaturesModule.registerShortcuts({
+        encode: () => document.getElementById('encodeBtn')?.click(),
+        decode: () => window.location.href = '/stegosafe/decode.html'
+      });
+
+      // Add message analysis on input
+      const messageInput = document.getElementById('messageInput');
+      if (messageInput) {
+        messageInput.addEventListener('input', () => {
+          const analysis = FeaturesModule.analyzeMessage(messageInput.value);
+          // Could display analysis in UI here
+        });
+      }
+    });
+  </script>
+</body>
+</html>
