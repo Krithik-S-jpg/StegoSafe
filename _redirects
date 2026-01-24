@@ -1,1 +1,15 @@
+# Don't redirect static assets
+/css/* 200
+/js/* 200
+/assets/* 200
+/pwa/* 200
+/*.css 200
+/*.js 200
+/*.png 200
+/*.jpg 200
+/*.svg 200
+/*.json 200
+/*.ico 200
+
+# Redirect all other requests to index.html for SPA routing
 /* /index.html 200
