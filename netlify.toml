@@ -7,6 +7,9 @@
   to = "/index.html"
   status = 200
 
+[context.production]
+  command = ""
+
 [[headers]]
   for = "/*"
   [headers.values]
